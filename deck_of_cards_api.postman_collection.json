@@ -1,0 +1,492 @@
+{
+	"info": {
+		"_postman_id": "59c531d3-1602-4a8d-a827-56399de8d61f",
+		"name": "Deck of Cards API",
+		"description": "A Postman API collection for the [\"Deck of Cards API\"](https://deckofcardsapi.com/) service.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "deck/:deckId",
+			"item": [
+				{
+					"name": "pile/:pileId",
+					"item": [
+						{
+							"name": "Adding to piles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/deck/:deckId/pile/:pileId/add?cards=4D",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"deck",
+										":deckId",
+										"pile",
+										":pileId",
+										"add"
+									],
+									"query": [
+										{
+											"key": "cards",
+											"value": "4D",
+											"description": "(required) A list of card codes to add to the pile. These cards must have been drawn from the deck. Separate the card codes with commas, and each card code is a just a two character case-insensitive string. The first character is the card name (A, 2, 3, 4, 5, 6, 7, 8, 9, 0, J, Q, K); the second character is the suit (S, D, C, H)."
+										}
+									],
+									"variable": [
+										{
+											"key": "deckId",
+											"value": "",
+											"description": "The deck ID that contains the pile to create/add to."
+										},
+										{
+											"key": "pileId",
+											"value": "",
+											"description": "The name of the pile to add to. Will create if it doesn't already exist."
+										}
+									]
+								},
+								"description": "Piles can be used for discarding cards. Piles are created on the fly, just give a pile a name and add a drawn card to the pile. If the pile didn't exist before, it does now. After a card has been drawn from the deck it can be moved from pile to pile.\n\nNote: This will not work with multiple decks."
+							},
+							"response": []
+						},
+						{
+							"name": "Listing cards in piles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/deck/:deckId/pile/:pileId/list",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"deck",
+										":deckId",
+										"pile",
+										":pileId",
+										"list"
+									],
+									"variable": [
+										{
+											"key": "deckId",
+											"value": "",
+											"description": "The deck ID that contains the pile to list."
+										},
+										{
+											"key": "pileId",
+											"value": "",
+											"description": "The pile ID to list."
+										}
+									]
+								},
+								"description": "List all cards in a pile.\n\nNote: This will not work with multiple decks."
+							},
+							"response": []
+						},
+						{
+							"name": "Shuffle piles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/deck/:deckId/pile/:pileId/shuffle",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"deck",
+										":deckId",
+										"pile",
+										":pileId",
+										"shuffle"
+									],
+									"variable": [
+										{
+											"key": "deckId",
+											"value": "",
+											"description": "The deck ID that contains the pile to shuffle."
+										},
+										{
+											"key": "pileId",
+											"value": "",
+											"description": "The pile ID to shuffle."
+										}
+									]
+								},
+								"description": "Shuffle the pile.\n\nNote: This will not work with multiple decks."
+							},
+							"response": []
+						},
+						{
+							"name": "Drawing from piles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/deck/:deckId/pile/:pileId/draw/:bottom",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"deck",
+										":deckId",
+										"pile",
+										":pileId",
+										"draw",
+										":bottom"
+									],
+									"query": [
+										{
+											"key": "count",
+											"value": "1",
+											"description": "(optional) How many cards should be delt? Default is 1.",
+											"disabled": true
+										},
+										{
+											"key": "cards",
+											"value": "4D",
+											"description": "(optional) Specify the cards that you want to draw from the pile. The default is to just draw off the top of the pile.",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "deckId",
+											"value": "",
+											"description": "The deck ID that contains the pile to draw from."
+										},
+										{
+											"key": "pileId",
+											"value": "",
+											"description": "The pile ID to draw from."
+										},
+										{
+											"key": "bottom",
+											"value": "",
+											"description": "(optional) Add the value \"bottom\" to draw from the bottom, else draw from the top by default."
+										}
+									]
+								},
+								"description": "Draw card(s) from a specified pile."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Deck Information",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.response.to.have.status(200);",
+									"const resp = pm.response.json();",
+									"",
+									"pm.test(\"Schema verification\", () => {",
+									"  pm.expect(resp.success).to.eql(true);",
+									"  pm.expect(resp.deck_id).to.be.a('string');",
+									"  pm.expect(resp.remaining).to.be.a('number');",
+									"  pm.expect(resp.shuffled).to.be.a('boolean');",
+									"});",
+									"",
+									"pm.test(\"A new deck is initialized correctly (unshuffled, correct card count)\", () => {",
+									"  pm.expect(resp.shuffled).to.eql(false);",
+									"  let cardsInDeck = pm.variables.get(\"cards\") ? pm.variables.get(\"cards\").split(\",\").length : 52;",
+									"  if (pm.variables.get(\"jokersEnabled\")) cardsInDeck += 2;",
+									"  const expectRemaining = (pm.variables.get(\"deckCount\") || 1) * cardsInDeck;",
+									"  pm.expect(resp.remaining).to.eql(expectRemaining);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/deck/:deckId/?deck_count={{deckCount}}&cards={{cards}}&jokers_enabled={{jokersEnabled}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"deck",
+								":deckId",
+								""
+							],
+							"query": [
+								{
+									"key": "deck_count",
+									"value": "{{deckCount}}",
+									"description": "(optional; does nothing if the deck already exists) How many decks of cards should be shuffled into the provided deck ID? Default is 1."
+								},
+								{
+									"key": "cards",
+									"value": "{{cards}}",
+									"description": "(optional; does nothing if the deck already exists) Default is all cards. If you want to use a partial deck, then you can pass the card codes you want to use using this parameter. Separate the card codes with commas, and each card code is a just a two character case-insensitive string. The first character is the card name (A, 2, 3, 4, 5, 6, 7, 8, 9, 0, J, Q, K); the second character is the suit (S, D, C, H)."
+								},
+								{
+									"key": "jokers_enabled",
+									"value": "{{jokersEnabled}}",
+									"description": "(optional; does nothing if the deck already exists) Default is false. Enable to include two Jokers in the deck."
+								}
+							],
+							"variable": [
+								{
+									"key": "deckId",
+									"value": "{{deckId}}",
+									"description": "Specify either \"new\" or a deck ID to get information for."
+								}
+							]
+						},
+						"description": "Get information for an existing deck, or create a new one."
+					},
+					"response": []
+				},
+				{
+					"name": "(Re)shuffle the cards",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.response.to.have.status(200);",
+									"const resp = pm.response.json();",
+									"",
+									"pm.test(\"Schema verification\", () => {",
+									"  pm.expect(resp.success).to.eql(true);",
+									"  pm.expect(resp.deck_id).to.be.a('string');",
+									"  pm.expect(resp.remaining).to.be.a('number');",
+									"  pm.expect(resp.shuffled).to.eql(true);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/deck/:deckId/shuffle/?deck_count={{deckCount}}&cards={{cards}}&jokers_enabled={{jokersEnabled}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"deck",
+								":deckId",
+								"shuffle",
+								""
+							],
+							"query": [
+								{
+									"key": "deck_count",
+									"value": "{{deckCount}}",
+									"description": "(optional) How many decks of cards should be shuffled into the provided deck ID? Default is 1."
+								},
+								{
+									"key": "cards",
+									"value": "{{cards}}",
+									"description": "(optional) Default is all cards. If you want to use a partial deck, then you can pass the card codes you want to use using this parameter. Separate the card codes with commas, and each card code is a just a two character case-insensitive string. The first character is the card name (A, 2, 3, 4, 5, 6, 7, 8, 9, 0, J, Q, K); the second character is the suit (S, D, C, H)."
+								},
+								{
+									"key": "jokers_enabled",
+									"value": "{{jokersEnabled}}",
+									"description": "(optional) Default is false. Enable to include two Jokers in the deck."
+								}
+							],
+							"variable": [
+								{
+									"key": "deckId",
+									"value": "{{deckId}}",
+									"description": "Specify either \"new\" or a deck ID to shuffle."
+								}
+							]
+						},
+						"description": "Creates (or reuses) the deck, and then shuffles it."
+					},
+					"response": []
+				},
+				{
+					"name": "Draw a card",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.response.to.have.status(200);",
+									"const resp = pm.response.json();",
+									"",
+									"pm.test(\"Schema verification\", () => {",
+									"  pm.expect(resp.deck_id).to.eql(pm.variables.get(\"deckId\"));",
+									"  pm.expect(resp.remaining).to.be.a('number');",
+									"  pm.expect(resp.cards).to.be.a('array');",
+									"});",
+									"",
+									"const beforeCardCount = pm.variables.get(\"beforeCardCount\");",
+									"",
+									"// drawCount defaults to 1 if unspecified.",
+									"const drawCount = pm.variables.get(\"drawCount\") || 1;",
+									"",
+									"// canDraw is whether we expect the draw operation to be successful or not, in case too many cards are attempted to be drawn.",
+									"const canDraw = pm.variables.get(\"beforeCardCount\") >= drawCount;",
+									"",
+									"pm.test(\"Can only fully draw an amount of cards that exist\", () => {",
+									"  pm.expect(resp.success).to.be.eql(canDraw);",
+									"});",
+									"",
+									"// Only applicable if the full draw operation was successful.",
+									"if (canDraw) {",
+									"  pm.test(\"Remaining card count is calculated correctly\", () => {",
+									"    // If the draw count is negative, the API draws until it reaches that amount of cards left.",
+									"    const expectedRemaining = (drawCount < 0) ? Math.abs(drawCount) : beforeCardCount - drawCount;",
+									"    pm.expect(resp.remaining).to.be.eql(expectedRemaining);",
+									"  });",
+									"}",
+									"",
+									"// Only applicable for partial draw operations",
+									"if (!canDraw) {",
+									"  pm.test(\"Even if too many cards are requested, all remaining cards are still drawn\", () => {",
+									"    pm.expect(resp.remaining).to.be.eql(0);",
+									"    pm.expect(beforeCardCount).to.be.eql(resp.cards.length);",
+									"  });",
+									"}",
+									"",
+									"// Only applicable for partial decks",
+									"if(pm.variables.get(\"cards\")) {",
+									"  pm.test(\"Cards drawn are only ones part of the deck\", () => {",
+									"    const cardsInDeck = pm.variables.get(\"cards\").split(\",\");",
+									"    resp.cards.forEach((card) => {",
+									"      pm.expect(cardsInDeck).to.include(card.code);",
+									"    });",
+									"  });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let deckCreateUrl = pm.variables.get('baseUrl') + \"/deck/new/?\";",
+									"",
+									"// Create non-standard decks for testing purposes",
+									"if (pm.variables.get('deckCount')) deckCreateUrl += `deck_count=${pm.variables.get('deckCount')}&`;",
+									"if (pm.variables.get('cards')) deckCreateUrl += `cards=${pm.variables.get('cards')}&`;",
+									"if (pm.variables.get('jokersEnabled')) deckCreateUrl += `jokers_enabled=${pm.variables.get('jokersEnabled')}&`;",
+									"",
+									"pm.sendRequest(deckCreateUrl, function (err, response) {",
+									"  pm.variables.set('deckId', response.json().deck_id);",
+									"  pm.variables.set('beforeCardCount', response.json().remaining);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/deck/:deckId/draw/?count={{drawCount}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"deck",
+								":deckId",
+								"draw",
+								""
+							],
+							"query": [
+								{
+									"key": "count",
+									"value": "{{drawCount}}",
+									"description": "(optional) How many cards should be delt? Default is 1."
+								}
+							],
+							"variable": [
+								{
+									"key": "deckId",
+									"value": "{{deckId}}",
+									"description": "Specify either \"new\" or a deck ID to draw from. Note that only a standard 52-card deck can be created through this endpoint."
+								}
+							]
+						},
+						"description": "Creates a new deck."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Reset deckId to \"new\" before every run, let individual request tests override this as needed",
+					"pm.variables.set(\"deckId\", \"new\");",
+					"",
+					"// Remove unused query parameters",
+					"if (!pm.variables.get(\"deckCount\")) {",
+					"  pm.request.url.query.remove(\"deck_count\");",
+					"}",
+					"if (!pm.variables.get(\"cards\")) {",
+					"  pm.request.url.query.remove(\"cards\");",
+					"}",
+					"if (!pm.variables.get(\"jokersEnabled\")) {",
+					"  pm.request.url.query.remove(\"jokers_enabled\");",
+					"}",
+					"if (!pm.variables.get(\"drawCount\")) {",
+					"  pm.request.url.query.remove(\"count\");",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://deckofcardsapi.com/api"
+		},
+		{
+			"key": "deckId",
+			"value": "new"
+		}
+	]
+}
