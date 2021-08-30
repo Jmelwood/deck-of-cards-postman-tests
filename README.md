@@ -1,8 +1,9 @@
-# deck-of-cards-postman-tests
+# Deck of Cards Postman API Tests
 
 ## Summary
 
 A Postman collection for the [Deck of Cards API](https://deckofcardsapi.com/) that includes tests.
+These are mostly happy path workflow tests with a couple of common scenarios attached via the `data_tests.csv` file. Postman is not a great place to do boundary/unit testing.
 
 ## Prerequisites
 
