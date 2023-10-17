@@ -1,5 +1,5 @@
-deckCount,deckCards,jokersEnabled,drawCount,pileDrawCount
-,,,3,
-5,,,,
-,"4D,3H,7C",,4,5
-,,true,-51,6
+deckCount,deckCards,returnCards,jokersEnabled,drawCount,pileDrawCount
+,,,,3,
+5,,,,,
+,"4D,3H,7C","3H",,4,5
+,,,true,-51,6

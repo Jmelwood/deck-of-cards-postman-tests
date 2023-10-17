@@ -7,9 +7,9 @@ These are mostly happy path workflow tests with a couple of common scenarios att
 
 ## Prerequisites
 
-- Postman (last tested with version 8.11.1)
-- Node.js (last tested with version LTS 14.17.5)
-- Newman (last tested with version 5.2.4)
+- Postman (last tested with version 10.19.5)
+- Node.js (last tested with version LTS 18.18.2)
+- Newman (last tested with version 6.0.0) - install via NPM
 
 ## How to run tests
 

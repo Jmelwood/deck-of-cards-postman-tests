@@ -3,7 +3,9 @@
 		"_postman_id": "59c531d3-1602-4a8d-a827-56399de8d61f",
 		"name": "Deck of Cards API",
 		"description": "A Postman API collection for the [\"Deck of Cards API\"](https://deckofcardsapi.com/) service.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17274644",
+		"_collection_link": "https://www.postman.com/jmcosel1/workspace/e1e6be65-a6cd-4d3c-92c7-60151657ae52/collection/17274644-59c531d3-1602-4a8d-a827-56399de8d61f?action=share&source=collection_link&creator=17274644"
 	},
 	"item": [
 		{
@@ -32,7 +34,6 @@
 											"  pm.expect(resp.piles).to.be.an('object');",
 											"});",
 											"",
-											"// There is a bug that can be found with this test - if jokers are enabled and one is drawn, it cannot be added successfully to a pile.",
 											"(skipTests ? pm.test.skip : pm.test)(\"A new pile is initialized correctly (exists, card count)\", () => {",
 											"  pm.expect(resp.piles).to.have.key(\"myPile\");",
 											"  const cardAddedCount = pm.variables.get(\"pileCards\").split(\",\").length;",
@@ -46,6 +47,9 @@
 									"listen": "prerequest",
 									"script": {
 										"exec": [
+											"// Add back the cards query parameter taken out at the collection-level.",
+											"// While \"deckCards\" is empty, \"pileCards\" is not and is required.",
+											"pm.request.url.query.add(`cards=${pm.variables.get('pileCards')}`);",
 											""
 										],
 										"type": "text/javascript"
@@ -341,6 +345,123 @@
 								"description": "Draw card(s) from a specified pile."
 							},
 							"response": []
+						},
+						{
+							"name": "Return cards to pile",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.response.to.have.status(200);",
+											"const resp = pm.response.json();",
+											"",
+											"// Only run these tests for scenarios where just a single/1 deck is used. Multiple decks are not supported.",
+											"const skipTests = pm.variables.get(\"deckCount\") > 1;",
+											"",
+											"const initialDeckCardCount = pm.variables.get(\"initialDeckCardCount\");",
+											"const initialPileCardCount = pm.variables.get(\"initialPileCardCount\");",
+											"",
+											"// drawCount defaults to 1 if unspecified.",
+											"const drawCount = pm.variables.get(\"pileDrawCount\") || 1;",
+											"",
+											"// canDraw is whether we expect the draw operation to be successful or not, in case too many cards are attempted to be drawn.",
+											"const canDraw = initialPileCardCount >= drawCount;",
+											"",
+											"// Only applicable if the full pile draw operation was successful.",
+											"if (canDraw) {",
+											"  (skipTests ? pm.test.skip : pm.test)(\"Schema verification\", () => {",
+											"    pm.expect(resp.deck_id).to.eql(pm.variables.get(\"deckId\"));",
+											"    pm.expect(resp.remaining).to.be.a('number');",
+											"    pm.expect(resp.piles).to.be.an('object');",
+											"    pm.expect(resp.piles[\"myPile\"]).to.be.an('object');",
+											"  });",
+											"",
+											"  // Only applicable for full returns",
+											"  if (!pm.variables.get(\"returnCards\")) {",
+											"    (skipTests ? pm.test.skip : pm.test)(\"All cards from the pile have been returned to the deck\", () => {",
+											"      pm.expect(resp.piles[\"myPile\"].remaining).to.eql(0)",
+											"      pm.expect(resp.remaining).to.eql(pm.variables.get(\"initialDeckCardCount\") + pm.variables.get(\"drawnPileCardCount\"))",
+											"    });",
+											"  }",
+											"",
+											"  // Only applicable for partial returns",
+											"  if (pm.variables.get(\"returnCards\")) {",
+											"    (skipTests ? pm.test.skip : pm.test)(\"Returning specific cards increases the remaining deck count appropriately\", () => {",
+											"      pm.expect(resp.piles[\"myPile\"].remaining).to.eql(pm.variables.get(\"drawnPileCardCount\") - pm.variables.get(\"returnCards\").split(\",\").length)",
+											"      pm.expect(resp.remaining).to.eql(pm.variables.get(\"initialDeckCardCount\") + pm.variables.get(\"returnCards\").split(\",\").length)",
+											"    });",
+											"  }",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// Create a pile for use",
+											"const pileCreateUrl = `${pm.variables.get('baseUrl')}/deck/${pm.variables.get('deckId')}/pile/myPile/add/?cards=${pm.variables.get('pileCards')}`;",
+											"pm.sendRequest(pileCreateUrl, function (err, resp1) {",
+											"  // This is the amount left in the main deck, after drawing some cards.",
+											"  // Placing drawn cards to a pile doesn't matter for this value, it remains the same",
+											"  // regardless.",
+											"    pm.variables.set('initialDeckCardCount', resp1.json().remaining);",
+											"    pm.variables.set('initialPileCardCount', resp1.json().piles[\"myPile\"].remaining)",
+											"  // Then \"draw\" another set of cards from the pile to ensure it only returns ones still in the pile",
+											"  let deckDrawUrl = pm.variables.get('baseUrl') + `/deck/${pm.variables.get('deckId')}/pile/myPile/draw/?`;",
+											"  if (pm.variables.get('pileDrawCount')) { ",
+											"    deckDrawUrl += `count=${pm.variables.get('pileDrawCount')}&`;",
+											"  } else if (pm.variables.get('deckCards')) {",
+											"    deckDrawUrl += `cards=${pm.variables.get('deckCards')}&`;",
+											"  }",
+											"",
+											"  pm.sendRequest(deckDrawUrl, function (err, resp2) {",
+											"    // The card count in the pile after \"drawing\" away some cards",
+											"    pm.variables.set('drawnPileCardCount', resp2.json().piles[\"myPile\"].remaining);",
+											"  });",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/deck/:deckId/pile/:pileId/return/?cards={{returnCards}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"deck",
+										":deckId",
+										"pile",
+										":pileId",
+										"return",
+										""
+									],
+									"query": [
+										{
+											"key": "cards",
+											"value": "{{returnCards}}"
+										}
+									],
+									"variable": [
+										{
+											"key": "deckId",
+											"value": "{{deckId}}"
+										},
+										{
+											"key": "pileId",
+											"value": "myPile"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					],
 					"event": [
@@ -584,7 +705,7 @@
 									"}",
 									"",
 									"// Only applicable for partial decks",
-									"if(pm.variables.get(\"cards\")) {",
+									"if(pm.variables.get(\"deckCards\")) {",
 									"  pm.test(\"Cards drawn are only ones part of the deck\", () => {",
 									"    const cardsInDeck = pm.variables.get(\"deckCards\").split(\",\");",
 									"    resp.cards.forEach((card) => {",
@@ -600,10 +721,10 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"// Create non-standard  + shuffled decks based on test data",
+									"// Create non-standard + shuffled decks based on test data",
 									"let deckCreateUrl = pm.variables.get('baseUrl') + \"/deck/new/shuffle/?\";",
 									"if (pm.variables.get('deckCount')) deckCreateUrl += `deck_count=${pm.variables.get('deckCount')}&`;",
-									"if (pm.variables.get('deckCards')) deckCreateUrl += `cards=${pm.variables.get('cards')}&`;",
+									"if (pm.variables.get('deckCards')) deckCreateUrl += `cards=${pm.variables.get('deckCards')}&`;",
 									"if (pm.variables.get('jokersEnabled')) deckCreateUrl += `jokers_enabled=${pm.variables.get('jokersEnabled')}&`;",
 									"",
 									"pm.sendRequest(deckCreateUrl, function (err, response) {",
@@ -647,6 +768,98 @@
 						"description": "Creates a new deck."
 					},
 					"response": []
+				},
+				{
+					"name": "Return cards",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.response.to.have.status(200);",
+									"const resp = pm.response.json();",
+									"",
+									"// Only run these tests for scenarios where just a single/1 deck is used. Multiple decks are not supported.",
+									"const skipTests = pm.variables.get(\"deckCount\") > 1;",
+									"",
+									"(skipTests ? pm.test.skip : pm.test)(\"Schema verification\", () => {",
+									"  pm.expect(resp.deck_id).to.eql(pm.variables.get(\"deckId\"));",
+									"  pm.expect(resp.remaining).to.be.a('number');",
+									"});",
+									"",
+									"// Only applicable for full returns",
+									"if (!pm.variables.get(\"returnCards\")) {",
+									"  (skipTests ? pm.test.skip : pm.test)(\"All cards have been returned to deck\", () => {",
+									"    pm.expect(resp.remaining).to.eql(pm.variables.get(\"initialCardCount\"))",
+									"  });",
+									"}",
+									"",
+									"// Only applicable for partial returns",
+									"if (pm.variables.get(\"returnCards\")) {",
+									"  (skipTests ? pm.test.skip : pm.test)(\"Returning specific cards increases the remaining count appropriately\", () => {",
+									"    pm.expect(resp.remaining).to.eql(pm.variables.get(\"drawnCardCount\") + pm.variables.get(\"returnCards\").split(\",\").length)",
+									"  });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Create non-standard + shuffled decks based on test data",
+									"let deckCreateUrl = pm.variables.get('baseUrl') + \"/deck/new/shuffle/?\";",
+									"if (pm.variables.get('deckCount')) deckCreateUrl += `deck_count=${pm.variables.get('deckCount')}&`;",
+									"if (pm.variables.get('deckCards')) deckCreateUrl += `cards=${pm.variables.get('deckCards')}&`;",
+									"if (pm.variables.get('jokersEnabled')) deckCreateUrl += `jokers_enabled=${pm.variables.get('jokersEnabled')}&`;",
+									"",
+									"pm.sendRequest(deckCreateUrl, function (err, resp1) {",
+									"  pm.variables.set('deckId', resp1.json().deck_id);",
+									"  pm.variables.set('initialCardCount', resp1.json().remaining);",
+									"",
+									"  // Then draw a set of cards from the deck so that they can be returned",
+									"  let deckDrawUrl = pm.variables.get('baseUrl') + `/deck/${pm.variables.get('deckId')}/draw/?`;",
+									"  if (pm.variables.get('drawCount')) deckDrawUrl += `count=${pm.variables.get('drawCount')}&`;",
+									"",
+									"  pm.sendRequest(deckDrawUrl, function (err, resp2) {",
+									"    pm.variables.set('drawnCardCount', resp2.json().remaining);",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/deck/:deckId/return/?cards={{returnCards}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"deck",
+								":deckId",
+								"return",
+								""
+							],
+							"query": [
+								{
+									"key": "cards",
+									"value": "{{returnCards}}"
+								}
+							],
+							"variable": [
+								{
+									"key": "deckId",
+									"value": "{{deckId}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -670,7 +883,7 @@
 					"if (!pm.variables.get(\"drawCount\")) {",
 					"  pm.request.url.query.remove(\"count\");",
 					"}",
-					"if (!pm.request.url.toString().includes(\"pile\") && !pm.variables.get(\"deckCards\")) {",
+					"if (!pm.variables.get(\"deckCards\")) {  ",
 					"  pm.request.url.query.remove(\"cards\");",
 					"}",
 					"if (pm.request.url.toString().includes(\"pile\") && !pm.variables.get(\"pileDrawCount\")) {",
