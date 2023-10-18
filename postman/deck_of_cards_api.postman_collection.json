@@ -2,10 +2,8 @@
 	"info": {
 		"_postman_id": "59c531d3-1602-4a8d-a827-56399de8d61f",
 		"name": "Deck of Cards API",
-		"description": "A Postman API collection for the [\"Deck of Cards API\"](https://deckofcardsapi.com/) service.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "17274644",
-		"_collection_link": "https://www.postman.com/jmcosel1/workspace/e1e6be65-a6cd-4d3c-92c7-60151657ae52/collection/17274644-59c531d3-1602-4a8d-a827-56399de8d61f?action=share&source=collection_link&creator=17274644"
+		"description": "## Summary\n\nA Postman collection for the [Deck of Cards API](https://deckofcardsapi.com/) that includes tests. These are mostly happy path workflow tests with a couple of common scenarios attached via the `data_tests.csv` file. Postman is not a great place to do boundary/unit testing.\n\n## Prerequisites\n\n- Postman (last tested with version 10.19.5)\n    \n- Node.js (last tested with version LTS 18.18.2)\n    \n- Newman (last tested with version 6.0.0) - install via NPM\n    \n\n## How to run tests\n\n### Postman GUI\n\n1. Clone this repository (`git clone https://github.com/Jmcosel/deck-of-cards-postman-tests.git`)\n    \n2. Open Postman and [import deck_of_cards_api.postman_collection.json](https://learning.postman.com/docs/getting-started/importing-and-exporting-data/)\n    \n3. Use the [Collection Runner](https://learning.postman.com/docs/running-collections/intro-to-collection-runs/) to run the test suite. Make sure to specify the `deck_data.csv` file for data variables.\n    \n\n### Newman CLI\n\n1. Clone this repository (`git clone https://github.com/Jmcosel/deck-of-cards-postman-tests.git`)\n    \n2. Simply run the following command: `newman run deck_of_cards_api.postman_collection.json -d deck_data.csv`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
@@ -20,6 +18,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "993812e5-6f5f-4e70-b795-b87d6a0f537e",
 										"exec": [
 											"const resp = pm.response.json();",
 											"",
@@ -46,6 +45,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "0c5de40f-50f2-4633-b9ea-48f09c00bb1c",
 										"exec": [
 											"// Add back the cards query parameter taken out at the collection-level.",
 											"// While \"deckCards\" is empty, \"pileCards\" is not and is required.",
@@ -56,6 +56,10 @@
 									}
 								}
 							],
+							"id": "87b7a9fc-b63c-40d2-bf7f-ac98b56e18cc",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -102,6 +106,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "16430579-7394-4d3b-ba8e-19d741e10dc2",
 										"exec": [
 											"// Create a pile for use",
 											"const pileCreateUrl = `${pm.variables.get('baseUrl')}/deck/${pm.variables.get('deckId')}/pile/myPile/add/?cards=${pm.variables.get('pileCards')}`;",
@@ -113,6 +118,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "52715ed5-5a44-42f7-83e6-a59c9cf608dc",
 										"exec": [
 											"const resp = pm.response.json();",
 											"",
@@ -140,6 +146,10 @@
 									}
 								}
 							],
+							"id": "0531ce72-934b-4288-a429-cd3de3293ba7",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -179,6 +189,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "4fc111e5-b791-4c42-9f60-9957655b1c31",
 										"exec": [
 											"// Create a pile for use",
 											"const pileCreateUrl = `${pm.variables.get('baseUrl')}/deck/${pm.variables.get('deckId')}/pile/myPile/add/?cards=${pm.variables.get('pileCards')}`;",
@@ -190,6 +201,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "ced40750-f2b6-47b5-83ed-c09803ae857f",
 										"exec": [
 											"const resp = pm.response.json();",
 											"",
@@ -209,6 +221,10 @@
 									}
 								}
 							],
+							"id": "990686f6-5a6d-4128-94e4-698e7cc6e747",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -248,6 +264,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "7054609a-4375-4adb-9500-3440b7fdc650",
 										"exec": [
 											"const resp = pm.response.json();",
 											"",
@@ -289,6 +306,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "6bd7474f-156c-40da-aafa-7832eba27c71",
 										"exec": [
 											"// Create a pile for use",
 											"const pileCreateUrl = `${pm.variables.get('baseUrl')}/deck/${pm.variables.get('deckId')}/pile/myPile/add/?cards=${pm.variables.get('pileCards')}`;",
@@ -300,6 +318,10 @@
 									}
 								}
 							],
+							"id": "031b63bd-5038-4de1-a1c7-627d5409aa53",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -352,6 +374,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "b77641c6-6223-4f7c-b99c-8720da0275fe",
 										"exec": [
 											"pm.response.to.have.status(200);",
 											"const resp = pm.response.json();",
@@ -400,6 +423,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "489fc084-9b44-4e81-bc01-c83e18a346ef",
 										"exec": [
 											"// Create a pile for use",
 											"const pileCreateUrl = `${pm.variables.get('baseUrl')}/deck/${pm.variables.get('deckId')}/pile/myPile/add/?cards=${pm.variables.get('pileCards')}`;",
@@ -427,6 +451,10 @@
 									}
 								}
 							],
+							"id": "d843f4d3-1a9a-4158-ad7e-4caaf701b49d",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
 							"request": {
 								"method": "GET",
 								"header": [],
@@ -446,28 +474,34 @@
 									"query": [
 										{
 											"key": "cards",
-											"value": "{{returnCards}}"
+											"value": "{{returnCards}}",
+											"description": "(optional) Use this parameter for for a list of cards to return (if valid)."
 										}
 									],
 									"variable": [
 										{
 											"key": "deckId",
-											"value": "{{deckId}}"
+											"value": "{{deckId}}",
+											"description": "The deck ID that contains the pile to draw from."
 										},
 										{
 											"key": "pileId",
-											"value": "myPile"
+											"value": "myPile",
+											"description": "The pile ID to draw from."
 										}
 									]
-								}
+								},
+								"description": "Use this call to return cards from a pile back to the main deck to re-use. It can take the cards parameter for a list of cards to return (if valid)."
 							},
 							"response": []
 						}
 					],
+					"id": "a9215a12-f78e-419e-989e-919f70d4ff69",
 					"event": [
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "611868f6-662c-4a58-bc41-0083a2b0ce0e",
 								"type": "text/javascript",
 								"exec": [
 									"// Create non-standard decks based on test data",
@@ -498,6 +532,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "a823891c-3225-44ad-a6f9-ac9ff370c6a5",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -512,6 +547,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "6bd726bf-fb8b-4c9f-b299-545ac286c10e",
 								"exec": [
 									"pm.response.to.have.status(200);",
 									"const resp = pm.response.json();",
@@ -537,6 +573,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "bfd0ed35-f3de-4cd8-a85a-8b61bdd89b65",
 								"exec": [
 									""
 								],
@@ -544,6 +581,10 @@
 							}
 						}
 					],
+					"id": "0c257f85-87df-4de4-a005-5ce3398c70a7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -592,6 +633,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "6a9dfcaa-d85c-46db-8fb7-effc91727c29",
 								"exec": [
 									""
 								],
@@ -601,6 +643,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "4e3e31df-9b81-4a01-9204-d52ad72993ef",
 								"exec": [
 									"pm.response.to.have.status(200);",
 									"const resp = pm.response.json();",
@@ -616,6 +659,10 @@
 							}
 						}
 					],
+					"id": "53564c58-952a-42c8-8534-f01f03b0ec03",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -665,6 +712,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "d2f90b18-51fc-4c85-8146-b2f6e8ad0588",
 								"exec": [
 									"pm.response.to.have.status(200);",
 									"const resp = pm.response.json();",
@@ -720,6 +768,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "ed3697d8-5cf5-43b1-a3f9-3ab114202da7",
 								"exec": [
 									"// Create non-standard + shuffled decks based on test data",
 									"let deckCreateUrl = pm.variables.get('baseUrl') + \"/deck/new/shuffle/?\";",
@@ -736,6 +785,10 @@
 							}
 						}
 					],
+					"id": "3dd373df-dc99-45dc-aea2-599e2d10485a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -775,6 +828,7 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "b77641c6-6223-4f7c-b99c-8720da0275fe",
 								"exec": [
 									"pm.response.to.have.status(200);",
 									"const resp = pm.response.json();",
@@ -807,6 +861,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "489fc084-9b44-4e81-bc01-c83e18a346ef",
 								"exec": [
 									"// Create non-standard + shuffled decks based on test data",
 									"let deckCreateUrl = pm.variables.get('baseUrl') + \"/deck/new/shuffle/?\";",
@@ -831,6 +886,10 @@
 							}
 						}
 					],
+					"id": "a3617aa5-6e23-4a32-8be8-e2c0003dc947",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -848,26 +907,31 @@
 							"query": [
 								{
 									"key": "cards",
-									"value": "{{returnCards}}"
+									"value": "{{returnCards}}",
+									"description": "(optional) Use this parameter for for a list of cards to return (if valid)."
 								}
 							],
 							"variable": [
 								{
 									"key": "deckId",
-									"value": "{{deckId}}"
+									"value": "{{deckId}}",
+									"description": "Specify the deck ID to return to."
 								}
 							]
-						}
+						},
+						"description": "Use this call to return cards which have been drawn back to the main deck to re-use. It can take the cards parameter for a list of cards to return (if valid)."
 					},
 					"response": []
 				}
-			]
+			],
+			"id": "e4dd2e3f-df7b-48d7-ba36-9c2414bbf417"
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
+				"id": "e74c7253-decc-4f5c-a82e-ca26a7d56d47",
 				"type": "text/javascript",
 				"exec": [
 					"// Reset deckId to \"new\" before every run, let individual request tests override this as needed",
@@ -895,6 +959,7 @@
 		{
 			"listen": "test",
 			"script": {
+				"id": "5ff717a4-1003-4807-8d81-28f4807a0163",
 				"type": "text/javascript",
 				"exec": [
 					""

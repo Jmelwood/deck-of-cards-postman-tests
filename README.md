@@ -22,4 +22,4 @@ These are mostly happy path workflow tests with a couple of common scenarios att
 ### Newman CLI
 
 1. Clone this repository (`git clone https://github.com/Jmcosel/deck-of-cards-postman-tests.git`)
-2. Simply run the following command: `newman run deck_of_cards_api.postman_collection.json -d deck_data.csv`
+2. Simply run the following command: `newman postman/run deck_of_cards_api.postman_collection.json -d deck_data.csv`
